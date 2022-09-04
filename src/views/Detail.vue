@@ -20,7 +20,8 @@
           :src="`https://image.tmdb.org/t/p/w342/${detail.poster_path}`" 
           max-width="342"
           width="342"
-          height="400"
+          cover
+          min-height="400"
           class="rounded-lg grey lighten-4"
         />
         <v-skeleton-loader v-else width="330" height="400"  type="image@2"/>
@@ -46,8 +47,8 @@
       <div class="mt-16">
         <div class="font-weight-bold mb-2">Credit:</div>
         <div>
-          <template v-for="cast in casts.slice(0, lengthOfCasts) || lengthOfCasts" >
-            <span v-if="casts" class="body-2 cast-name" :key="cast">{{cast}}</span>
+          <template v-for="(cast, index) in casts.slice(0, lengthOfCasts) || lengthOfCasts" >
+            <span v-if="casts" class="body-2 cast-name" :key="cast + index">{{cast}}</span>
             <v-skeleton-loader v-else type="text" min-width="80" :key="cast" tag="div" class="d-inline-block mr-1"/>
           </template>
           <v-btn 

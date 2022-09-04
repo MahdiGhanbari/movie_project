@@ -32,7 +32,7 @@
         <movie-card :movie="item" :loading="loading" width="320" height="211" />
       </v-col>
     </v-row>
-    <pagination v-model="page" :totalPages="totalPages" :totalItems="totalItems" />
+    <pagination v-model="page" @input="search" :totalPages="totalPages" :totalItems="totalItems" />
   </div>
 </template>
 
@@ -55,19 +55,38 @@ export default {
   },
   methods: {
     async search() {
-      const query = {page : this.page || 1}
-      if(this.dateRangeText) {
-        query['range'] = this.dateRangeText
-      }
-      this.$router.push({path: '/', query})
-
       this.loading = true
+      this.updateQueryString()
       const res = await this.$db.getListOfMovies(this.dateRange, this.page)
-      const {results, total_pages, total_results} = res
-      this.list = results
-      this.totalPages = total_pages
-      this.totalItems = total_results
+      if(res) {
+        const {results, total_pages, total_results} = res
+        this.list = results
+        this.totalPages = total_pages
+        this.totalItems = total_results
+      }
       this.loading = false
+    },
+    updateQueryString() {
+      let {page, range} = this.getQueryString()
+      if(this.page != page || this.dateRange.toString() != range.toString()) {
+        const query = {page: this.page}
+        if(this.dateRangeText) {
+          query['range'] = this.dateRangeText
+        }
+        this.$router.replace({path: '/', query})
+      }
+    },
+    getQueryString() {
+      let {page, range} = this.$route.query
+      page = +page > 0 ? +page : 1
+      range = decodeURI(range || '')
+      const [start, end] = range.split(' ~ ')
+      if(Date.parse(start) && Date.parse(end)) {
+        range = [start, end]
+      } else {
+        range = []
+      }
+      return {page, range}
     }
   },
   computed: {
@@ -75,17 +94,14 @@ export default {
       return this.dateRange.join(' ~ ')
     }
   },
-  watch: {
-    page: 'search'
-  },
   components: {
     MovieCard,
     Pagination
   },
-  mounted() {
-    const {page, range} = this.$route.query
-    this.page = +page || 1
-    this.dateRange = range ? range.split('~') : ''
+  beforeMount() {
+    let {page, range} = this.getQueryString()
+    this.page = page
+    this.dateRange = range
     this.search()
   }
 }

@@ -19,17 +19,10 @@ const routes = [
   { path: "*", redirect: "/" }
 ]
 
-
 const router = new VueRouter({
   mode: 'history',
   base: process.env.BASE_URL,
   routes
 })
-
-// router.beforeEach((to, from) => {
-//   // ...
-//   // explicitly return false to cancel the navigation
-//   return false
-// })
 
 export default router

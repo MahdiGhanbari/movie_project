@@ -3,7 +3,6 @@ import axios from 'axios'
 const api_key = 'f62f750b70a8ef11dad44670cfb6aa57'
 
 function httpResponseHandler(response) {
-  console.log(response)
   if (response.data) {
     return Promise.resolve(response.data)
   }
@@ -11,20 +10,9 @@ function httpResponseHandler(response) {
 }
 
 function httpErrorHandler(error) {
-  console.log('error', error)
-  // let result = {}
-  // if(error.response) {
-  //   // the request is correct but the response has error, to show that error need to parse the response html and extract message
-  //   try {
-  //     const span = document.createElement('span')
-  //     span.innerHTML = error.response.data
-  //     result = span.textContent || span.innerText
-  //     result = /{.+}/.exec(result)[0]
-  //     result = JSON.parse(result).error
-  //   } catch (err) {
-  //     console.log('parsing error', err)
-  //   }
-  }
+  console.log(error.code)
+  // TODO: handle the errors
+}
 
 class DB {
   constructor(STORE, baseURL) {
@@ -40,7 +28,6 @@ class DB {
     )
 
     this.api.interceptors.request.use(request => {
-      console.log(request)
       request.params = {...request.params, api_key}
       return request
     })
